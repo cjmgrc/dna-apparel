@@ -27,6 +27,10 @@ const P: Record<string, string> = {
   bags: "M5 8h14l1 13H4L5 8zM9 8V6a3 3 0 0 1 6 0v2",
   chev: "M6 9l6 6 6-6",
   sliders: "M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4",
+  pin: "M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+  box: "M3 7l9-4 9 4v10l-9 4-9-4V7zM3 7l9 4 9-4M12 11v10",
+  bell: "M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2zM10 21h4",
+  lock: "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4",
   ticket: "M3 8a2 2 0 0 0 0 4v4h18v-4a2 2 0 0 1 0-4V6H3v2zM9 6v12",
 };
 export function Icon(props: { n: string; s?: number }) {

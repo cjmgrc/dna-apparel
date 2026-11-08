@@ -1,6 +1,7 @@
 import { createEffect, createSignal, For, onMount, Route, Router, Show } from "cajoa";
 import { Icon } from "./components/Icon";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { Account } from "./pages/Account";
 import { Categories } from "./pages/Categories";
 import { Checkout } from "./pages/Checkout";
 import { Discover } from "./pages/Discover";
@@ -10,7 +11,7 @@ import { Product } from "./pages/Product";
 import { Wishlist } from "./pages/Wishlist";
 import { FREE_SHIPPING, categories, find, peso } from "./data";
 import type { Line } from "./state";
-import { applyPromo, bag, bagOpen, count, go, gross, nav, setQuery, query, notice, setNotice, path, promo, remove, requestOrder, setBagOpen, setQty, signOut, subtotal, user, wish } from "./state";
+import { applyPromo, bag, bagOpen, count, go, gross, nav, setQuery, query, notice, setNotice, path, promo, remove, requestOrder, setBagOpen, setQty, subtotal, user, wish } from "./state";
 
 function Tab(props: { href: string; label: string }) {
   const on = () => (props.href === "/" ? path() === "/" : path().startsWith(props.href));
@@ -18,7 +19,7 @@ function Tab(props: { href: string; label: string }) {
 }
 
 const NotFound = () => (
-  <div class="wrap page"><h1 class="h-md">404. Off the grid.</h1><a class="btn" href="/" onClick={go}>Back to Discover</a></div>
+  <div class="wrap page"><div class="empty"><span class="ei"><Icon n="search" s={28} /></span><h2>Page not found</h2><a class="btn solid" href="/" onClick={go}>Home</a></div></div>
 );
 
 export function App() {
@@ -63,7 +64,7 @@ export function App() {
           </form>
           <a class="ico" href="/wishlist" onClick={go} aria-label={`Saved, ${wish().length}`}><Icon n="heart" /><b>{wish().length}</b></a>
           <button class="ico" onClick={() => setBagOpen(true)} aria-label={`Bag, ${count()} items`}><Icon n="bag" /><b>{count()}</b></button>
-          <Show when={user()} fallback={<a class="ico hide-s" href="/login" onClick={go} aria-label="Sign in"><Icon n="user" /></a>}><button class="ico hide-s" onClick={signOut} aria-label="Sign out"><Icon n="out" /></button></Show>
+          <a class="ico hide-s" href={user() ? "/account" : "/login"} onClick={go} aria-label="Account"><Icon n="user" /></a>
           <ThemeToggle />
         </div>
       </header>
@@ -75,6 +76,7 @@ export function App() {
           <Route path="/categories" component={Categories} />
           <Route path="/categories/:slug" component={Categories} />
           <Route path="/product/:slug" component={Product} />
+          <Route path="/account" component={Account} />
           <Route path="/wishlist" component={Wishlist} />
           <Route path="/info" component={Info} />
           <Route path="/checkout" component={Checkout} />
@@ -107,7 +109,7 @@ export function App() {
       </div>
 
       <nav class="bn" aria-label="Quick">
-        <a href="/" onClick={go} aria-label="Home"><Icon n="home" s={24} /></a><a href="/shop" onClick={go} aria-label="Shop"><Icon n="grid" s={24} /></a><a href="/wishlist" onClick={go} aria-label="Saved"><Icon n="heart" s={24} /><b>{wish().length}</b></a><button onClick={() => setBagOpen(true)} aria-label="Bag"><Icon n="bag" s={24} /><b>{count()}</b></button><a href="/login" onClick={go} aria-label="Account"><Icon n="user" s={24} /></a>
+        <a href="/" onClick={go} aria-label="Home"><Icon n="home" s={24} /></a><a href="/shop" onClick={go} aria-label="Shop"><Icon n="grid" s={24} /></a><a href="/wishlist" onClick={go} aria-label="Saved"><Icon n="heart" s={24} /><b>{wish().length}</b></a><button onClick={() => setBagOpen(true)} aria-label="Bag"><Icon n="bag" s={24} /><b>{count()}</b></button><a href={user() ? "/account" : "/login"} onClick={go} aria-label="Account"><Icon n="user" s={24} /></a>
       </nav>
       <div class={bagOpen() ? "scrim on" : "scrim"} onClick={() => setBagOpen(false)} />
       <aside class={bagOpen() ? "drawer on" : "drawer"} role="dialog" aria-label="Shopping bag">

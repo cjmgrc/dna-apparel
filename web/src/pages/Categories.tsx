@@ -48,7 +48,7 @@ export function Categories() {
         <span class="pv">{fmt(hi())}</span>
         <button class="icon-btn" aria-label="Reset price" onClick={() => { setLo(MIN); setHi(MAX); }}><Icon n="ret" s={18} /></button>
       </div>
-      <Show when={list().length === 0}><p class="mut">Nothing matches. Clear the search or pick another category.</p></Show>
+      <Show when={list().length === 0}><div class="empty"><span class="ei"><Icon n="search" s={28} /></span><button class="btn" onClick={() => { setQuery(""); setLo(MIN); setHi(MAX); }}>Clear filters</button></div></Show>
       <div class="grid"><For each={list()}>{(p: Product) => <Card p={p} />}</For></div>
     </div>
   );

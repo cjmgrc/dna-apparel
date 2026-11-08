@@ -91,3 +91,8 @@ export const [wish, setWish] = createSignal<string[]>(read("dna.wish", []));
 export const toggleWish = (id: string) => { const w = wish().includes(id) ? wish().filter((x) => x !== id) : [...wish(), id]; setWish(w); write("dna.wish", w); };
 
 export const [query, setQuery] = createSignal("");
+
+export const updateUser = (u: Partial<User>) => signIn({ ...user()!, ...u });
+export interface Order { id: string; date: string; total: number; lines: Line[]; status: string }
+export const [orders, setOrders] = createSignal<Order[]>(read("dna.orders", []));
+export const saveOrder = () => { const o: Order = { id: "DNA-" + Date.now().toString().slice(-6), date: new Date().toISOString(), total: subtotal(), lines: bag(), status: "Processing" }; setOrders([o, ...orders()]); write("dna.orders", orders()); };

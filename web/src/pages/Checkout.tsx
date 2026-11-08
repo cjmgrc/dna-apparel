@@ -1,7 +1,7 @@
 import { createSignal, For, onMount, Show } from "cajoa";
 import type { Line } from "../state";
 import { FREE_SHIPPING, SHIPPING, find, peso } from "../data";
-import { bag, clearBag, count, go, nav, setPending, subtotal, user } from "../state";
+import { bag, clearBag, count, go, nav, setPending, subtotal, user, saveOrder } from "../state";
 
 export function Checkout() {
   const first = (user()?.name ?? "").split(" ")[0];
@@ -19,7 +19,7 @@ export function Checkout() {
   const place = (e: Event) => {
     e.preventDefault();
     setOrderId("DNA-" + Math.random().toString(36).slice(2, 8).toUpperCase());
-    clearBag();
+    saveOrder(); clearBag();
   };
 
   return (
