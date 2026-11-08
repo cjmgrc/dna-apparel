@@ -47,8 +47,8 @@ export function Checkout() {
                       <For each={bag()}>
                         {(l: Line) => (
                           <li>
-                            <span>{find(l.id)!.name} ×{l.qty}</span>
-                            <span>{peso(find(l.id)!.price * l.qty)}</span>
+                            <span>{find(l.id.split("|")[0])!.name} ×{l.qty}</span>
+                            <span>{peso(find(l.id.split("|")[0])!.price * l.qty)}</span>
                           </li>
                         )}
                       </For>

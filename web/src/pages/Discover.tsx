@@ -1,38 +1,75 @@
-import { For } from "cajoa";
+import { createSignal, For, onMount } from "cajoa";
 import { Card } from "../components/Card";
-import type { Product } from "../data";
-import { products } from "../data";
-import { go, orderNow } from "../state";
+import type { Category, Product } from "../data";
+import { categories, peso, products, stats } from "../data";
+import { add, go, orderNow } from "../state";
 
-function Row(props: { title: string; items: Product[]; href: string }) {
-  return (
-    <section class="wrap rowsec">
-      <div class="head">
-        <h2>{props.title}</h2>
-        <a href={props.href} onClick={go}>View all</a>
-      </div>
-      <div class="grid">
-        <For each={props.items}>{(p: Product) => <Card p={p} />}</For>
-      </div>
-    </section>
-  );
-}
+const slides = [
+  { t: "Helix tee: new colorways", s: "Our best seller is back. Order it before the run ends.", id: "helix-tee", bg: "#c9dcff", fg: "#1c1c1e" },
+  { t: "Hoodie season", s: "Brushed fleece from ₱3,090. Free delivery over ₱3,000.", id: "monolith-hoodie", bg: "#cfe9d6", fg: "#1c1c1e" },
+  { t: "Outerwear drop", s: "Vector bomber and Relay coach. Small run.", id: "vector-bomber", bg: "#ffd9c7", fg: "#1c1c1e" },
+];
+const vouchers = [["10% off", "Code DNA10, no minimum"], ["Free delivery", "On orders over ₱3,000"], ["14-day returns", "Unworn, with tags"]];
 
 export function Discover() {
-  const hero = products.find((p) => p.id === "helix-tee")!;
-  const by = (cat: string) => products.filter((p) => p.cat === cat).slice(0, 4);
+  const [i, setI] = createSignal(0);
+  const [left, setLeft] = createSignal("");
+  const [tab, setTab] = createSignal("all");
+  const [got, setGot] = createSignal<string[]>([]);
+  onMount(() => {
+    setInterval(() => setI((n) => (n + 1) % slides.length), 5000);
+    const tick = () => {
+      const n = new Date(); const e = new Date(n); e.setHours(24, 0, 0, 0);
+      const s = Math.floor((e.getTime() - n.getTime()) / 1000);
+      setLeft([Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60].map((x) => String(x).padStart(2, "0")).join(" : "));
+    };
+    tick(); setInterval(tick, 1000);
+  });
+  const flash = () => products.filter((p) => stats(p).off >= 15 && !p.soldOut).slice(0, 8);
+  const feed = () => (tab() === "new" ? products.filter((p) => p.featured) : tab() === "top" ? [...products].sort((a, b) => stats(b).sold - stats(a).sold) : products);
   return (
-    <div>
-      <section class="banner" style={{ background: hero.hex, color: hero.fg, "--tile": hero.hex }}>
-        <div class="wrap">
-          <h1>{hero.name} — new colorways</h1>
-          <p>Our best-selling tee is back in new colors. Choose yours and wear it.</p>
-          <button class="btn solid" onClick={() => orderNow(hero.id)}>ORDER NOW</button>
+    <div class="wrap mk">
+      <section class="ban" aria-roledescription="carousel" aria-label="Featured">
+        <div class="trk" style={{ transform: `translateX(-${i() * 100}%)` }}>
+          <For each={slides}>{(s: any) => (
+            <div class="sl" style={{ background: s.bg, color: s.fg }}>
+              <h1>{s.t}</h1><p>{s.s}</p>
+              <button class="btn mag" style={{ "border-color": s.fg }} onClick={() => orderNow(s.id)}>Order now</button>
+              <span class="bigmark" aria-hidden="true">DNA</span>
+            </div>
+          )}</For>
+        </div>
+        <div class="dots"><For each={slides}>{(s: any, n: () => number) => <button class={i() === n() ? "on" : ""} aria-label={`Slide ${n() + 1}`} onClick={() => setI(n())} />}</For></div>
+      </section>
+
+      <ul class="vch">
+        <For each={vouchers}>{(v: string[]) => (<li data-r><div><b>{v[0]}</b><span class="mut">{v[1]}</span></div><button class="btn" onClick={() => setGot([...got(), v[0]])} disabled={got().includes(v[0])}>{got().includes(v[0]) ? "Claimed" : "Claim"}</button></li>)}</For>
+      </ul>
+
+      <ul class="ci">
+        <For each={categories}>{(c: Category) => (<li data-r><a href={`/categories/${c.id}`} onClick={go}><span class="gl">{c.name[0]}</span><span>{c.name}</span></a></li>)}</For>
+      </ul>
+
+      <section class="fl">
+        <div class="fh"><h2>Flash sale</h2><p class="cd" aria-label="Ends in">{left()}</p><a class="mr" href="/shop" onClick={go}>See all</a></div>
+        <div class="hs">
+          <For each={flash()}>{(p: Product) => { const s = stats(p); return (
+            <article class="fc" data-r>
+              <a class="tile" href={`/product/${p.id}`} onClick={go} aria-label={p.name} style={{ "--a": p.hex, "--b": p.fg }}><span class="tn">{p.name}</span><u class="off">-{s.off}%</u></a>
+              <p class="pr"><b>{peso(p.price).replace(" PHP", "")}</b></p>
+              <div class="sold"><i style={{ width: `${s.left}%` }} /><span>{s.left}% sold</span></div>
+              <button class="txt" onClick={() => add(p.id, p.cat === "headwear" || p.cat === "bags" ? "One size" : "M")}>Add to bag</button>
+            </article>); }}</For>
         </div>
       </section>
-      <Row title="New release" items={products.filter((p) => p.featured).slice(0, 4)} href="/categories" />
-      <Row title="Essentials – Tees" items={by("tees")} href="/categories/tees" />
-      <Row title="Stay warm" items={by("hoodies")} href="/categories/hoodies" />
+
+      <section class="feed">
+        <div class="tabs" role="tablist">
+          <For each={[["all", "Just for you"], ["new", "New"], ["top", "Best sellers"]]}>{(t: string[]) => (<button role="tab" aria-selected={tab() === t[0] ? "true" : "false"} class={tab() === t[0] ? "on" : ""} onClick={() => setTab(t[0])}>{t[1]}</button>)}</For>
+        </div>
+        <div class="grid"><For each={feed()}>{(p: Product) => <Card p={p} />}</For></div>
+        <a class="btn more" href="/shop" onClick={go}>See all pieces</a>
+      </section>
     </div>
   );
 }

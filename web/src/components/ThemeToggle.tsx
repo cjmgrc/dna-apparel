@@ -9,9 +9,7 @@ function initialTheme(): Theme {
   } catch {
     // storage is not available
   }
-  return window.matchMedia("(prefers-color-scheme: light)").matches
-    ? "light"
-    : "dark";
+  return (document.documentElement.dataset.theme as Theme) || "dark";
 }
 
 function SunIcon() {

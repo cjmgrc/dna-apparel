@@ -45,17 +45,18 @@ const save = (l: Line[]) => {
   setBag(l);
   write("dna.bag", l);
 };
-export const add = (id: string) => {
+export const add = (pid: string, size = "M") => {
+  const id = `${pid}|${size}`;
   const l = bag();
   save(l.some((x) => x.id === id) ? l.map((x) => (x.id === id ? { ...x, qty: x.qty + 1 } : x)) : [...l, { id, qty: 1 }]);
-  setNotice(id);
+  setNotice(pid);
   clearTimeout(timer);
   timer = window.setTimeout(() => setNotice(null), 8000);
 };
 export const remove = (id: string) => save(bag().filter((x) => x.id !== id));
 export const clearBag = () => save([]);
 export const count = () => bag().reduce((n, l) => n + l.qty, 0);
-export const subtotal = () => bag().reduce((n, l) => n + l.qty * (find(l.id)?.price ?? 0), 0);
+export const gross = () => bag().reduce((n, l) => n + l.qty * (find(l.id.split("|")[0])?.price ?? 0), 0);
 
 // --- auth (frontend only: swap signIn's caller for your API)
 export const [user, setUser] = createSignal<User | null>(read("dna.user", null));
@@ -77,7 +78,16 @@ export function requestOrder() {
   setPending("/checkout");
   nav("/login");
 }
-export const orderNow = (id: string) => {
-  add(id);
+export const orderNow = (id: string, size = "M") => {
+  add(id, size);
   requestOrder();
 };
+
+export const [promo, setPromo] = createSignal(read("dna.promo", ""));
+export const applyPromo = (c: string) => { const v = c.trim().toUpperCase(); setPromo(v === "DNA10" ? v : ""); write("dna.promo", promo()); return promo() !== ""; };
+export const subtotal = () => Math.round(gross() * (promo() ? 0.9 : 1));
+export const setQty = (id: string, d: number) => save(bag().map((x) => (x.id === id ? { ...x, qty: x.qty + d } : x)).filter((x) => x.qty > 0));
+export const [wish, setWish] = createSignal<string[]>(read("dna.wish", []));
+export const toggleWish = (id: string) => { const w = wish().includes(id) ? wish().filter((x) => x !== id) : [...wish(), id]; setWish(w); write("dna.wish", w); };
+
+export const [query, setQuery] = createSignal("");
