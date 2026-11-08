@@ -1,15 +1,16 @@
 import { createSignal, For, onMount } from "cajoa";
+import { Icon } from "../components/Icon";
 import { Card } from "../components/Card";
 import type { Category, Product } from "../data";
 import { categories, peso, products, stats } from "../data";
 import { add, go, orderNow } from "../state";
 
 const slides = [
-  { t: "Helix tee: new colorways", s: "Our best seller is back. Order it before the run ends.", id: "helix-tee", bg: "#c9dcff", fg: "#1c1c1e" },
-  { t: "Hoodie season", s: "Brushed fleece from ₱3,090. Free delivery over ₱3,000.", id: "monolith-hoodie", bg: "#cfe9d6", fg: "#1c1c1e" },
-  { t: "Outerwear drop", s: "Vector bomber and Relay coach. Small run.", id: "vector-bomber", bg: "#ffd9c7", fg: "#1c1c1e" },
+  { t: "Helix tee: new colorways", s: "Back in four colorways.", id: "helix-tee", bg: "#c9dcff", fg: "#1c1c1e" },
+  { t: "Hoodie season", s: "Brushed fleece, from ₱3,090.", id: "monolith-hoodie", bg: "#cfe9d6", fg: "#1c1c1e" },
+  { t: "Outerwear drop", s: "Small run. No restocks.", id: "vector-bomber", bg: "#ffd9c7", fg: "#1c1c1e" },
 ];
-const vouchers = [["10% off", "Code DNA10, no minimum"], ["Free delivery", "On orders over ₱3,000"], ["14-day returns", "Unworn, with tags"]];
+const vouchers = [["tag", "10% off", "DNA10"], ["truck", "Free delivery", "Over ₱3,000"], ["ret", "Returns", "14 days"]];
 
 export function Discover() {
   const [i, setI] = createSignal(0);
@@ -43,32 +44,31 @@ export function Discover() {
       </section>
 
       <ul class="vch">
-        <For each={vouchers}>{(v: string[]) => (<li data-r><div><b>{v[0]}</b><span class="mut">{v[1]}</span></div><button class="btn" onClick={() => setGot([...got(), v[0]])} disabled={got().includes(v[0])}>{got().includes(v[0]) ? "Claimed" : "Claim"}</button></li>)}</For>
+        <For each={vouchers}>{(v: string[]) => (<li data-r><span class="vi"><Icon n={v[0]} /></span><div><b>{v[1]}</b><span class="mut sm">{v[2]}</span></div><button class="btn" onClick={() => setGot([...got(), v[1]])} disabled={got().includes(v[1])} aria-label={`Claim ${v[1]}`}><Icon n={got().includes(v[1]) ? "check" : "plus"} s={18} /></button></li>)}</For>
       </ul>
 
       <ul class="ci">
-        <For each={categories}>{(c: Category) => (<li data-r><a href={`/categories/${c.id}`} onClick={go}><span class="gl">{c.name[0]}</span><span>{c.name}</span></a></li>)}</For>
+        <For each={categories}>{(c: Category) => (<li data-r><a href={`/categories/${c.id}`} onClick={go}><span class="gl"><Icon n={c.id} s={26} /></span><span>{c.name}</span></a></li>)}</For>
       </ul>
 
       <section class="fl">
-        <div class="fh"><h2>Flash sale</h2><p class="cd" aria-label="Ends in">{left()}</p><a class="mr" href="/shop" onClick={go}>See all</a></div>
+        <div class="fh"><h2><Icon n="bolt" s={22} />Flash</h2><p class="cd" aria-label="Ends in">{left()}</p><a class="mr" href="/shop" onClick={go} aria-label="See all"><Icon n="next" s={18} /></a></div>
         <div class="hs">
           <For each={flash()}>{(p: Product) => { const s = stats(p); return (
             <article class="fc" data-r>
               <a class="tile" href={`/product/${p.id}`} onClick={go} aria-label={p.name} style={{ "--a": p.hex, "--b": p.fg }}><span class="tn">{p.name}</span><u class="off">-{s.off}%</u></a>
               <p class="pr"><b>{peso(p.price).replace(" PHP", "")}</b></p>
-              <div class="sold"><i style={{ width: `${s.left}%` }} /><span>{s.left}% sold</span></div>
-              <button class="txt" onClick={() => add(p.id, p.cat === "headwear" || p.cat === "bags" ? "One size" : "M")}>Add to bag</button>
+              <div class="sl-row"><div class="sold"><i style={{ width: `${s.left}%` }} /></div>{s.left}%</div>
             </article>); }}</For>
         </div>
       </section>
 
       <section class="feed">
         <div class="tabs" role="tablist">
-          <For each={[["all", "Just for you"], ["new", "New"], ["top", "Best sellers"]]}>{(t: string[]) => (<button role="tab" aria-selected={tab() === t[0] ? "true" : "false"} class={tab() === t[0] ? "on" : ""} onClick={() => setTab(t[0])}>{t[1]}</button>)}</For>
+          <For each={[["all", "For you"], ["new", "New"], ["top", "Top"]]}>{(t: string[]) => (<button role="tab" aria-selected={tab() === t[0] ? "true" : "false"} class={tab() === t[0] ? "on" : ""} onClick={() => setTab(t[0])}>{t[1]}</button>)}</For>
         </div>
         <div class="grid"><For each={feed()}>{(p: Product) => <Card p={p} />}</For></div>
-        <a class="btn more" href="/shop" onClick={go}>See all pieces</a>
+        <a class="btn more" href="/shop" onClick={go}aria-label="See all">All<Icon n="arrow" s={18} /></a>
       </section>
     </div>
   );
