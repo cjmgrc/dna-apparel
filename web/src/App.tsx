@@ -100,7 +100,7 @@ export function App() {
       </footer>
 
       <div class={notice() ? "toast on" : "toast"} role="status">
-        <p><b>Added</b> <span class="mut">{notice() ? find(notice()!)!.name : ""}</span></p>
+        <p class="tp"><span class="tck"><Icon n="check" s={16} /></span><b>Added</b> <span class="mut">{notice() ? find(notice()!)!.name : ""}</span></p>
         <div class="tb">
           <button class="btn" onClick={() => { setNotice(null); setBagOpen(true); }} aria-label="View bag"><Icon n="bag" s={18} />Bag</button>
           <button class="btn solid" onClick={requestOrder}>Checkout<Icon n="arrow" s={18} /></button>

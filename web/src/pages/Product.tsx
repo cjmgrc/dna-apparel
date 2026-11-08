@@ -22,9 +22,9 @@ export function Product() {
               <For each={sizesFor(p()!.cat)}>{(s: string) => (<button class={pick() === s ? "sz on" : "sz"} aria-pressed={pick() === s ? "true" : "false"} onClick={() => setSize(s)}>{s}</button>)}</For>
             </fieldset>
             <div class="acts">
-              <button class="btn solid mag" disabled={p()!.soldOut} onClick={() => add(p()!.id, pick())}><Icon n="bag" s={18} />{p()!.soldOut ? "Sold out" : "Add"}</button>
+              <button class="btn solid mag" data-fly="1" disabled={p()!.soldOut} onClick={() => add(p()!.id, pick())}><Icon n="bag" s={18} />{p()!.soldOut ? "Sold out" : "Add"}</button>
               <button class="btn mag" disabled={p()!.soldOut} onClick={() => orderNow(p()!.id, pick())}>Buy<Icon n="arrow" s={18} /></button>
-              <button class={wish().includes(p()!.id) ? "heart on" : "heart"} onClick={() => toggleWish(p()!.id)} aria-label="Save" aria-pressed={wish().includes(p()!.id) ? "true" : "false"}><Icon n="heart" s={20} /></button>
+              <button data-heart="1" class={wish().includes(p()!.id) ? "heart on" : "heart"} onClick={() => toggleWish(p()!.id)} aria-label="Save" aria-pressed={wish().includes(p()!.id) ? "true" : "false"}><Icon n="heart" s={20} /></button>
             </div>
             <details><summary><span class="vs"><Icon n="tees" s={18} />Fit</span></summary><p class="mut">Boxy cut. Size down between sizes. 260 gsm cotton.</p></details>
             <details><summary><span class="vs"><Icon n="truck" s={18} />Delivery</span></summary><p class="mut">₱150, free over ₱3,000. Returns within 14 days.</p></details>
